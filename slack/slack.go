@@ -84,8 +84,12 @@ func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
 	if len(splitMessage) == 2 {
 		outputString := fmt.Sprintf("https://golang.org/pkg/%s/#%s", splitMessage[0], splitMessage[1])
 		slackClient.SendMessage(slackClient.NewOutgoingMessage(outputString, slackChannel))
+	} else if len(splitMessage) == 1 && message != "help"{
+		outputString := fmt.Sprintf("https://golang.org/pkg/%s", message)
+		slackClient.SendMessage(slackClient.NewOutgoingMessage(outputString, slackChannel))
 	}
-	fmt.Println("Split message:", splitMessage)
+
+	// fmt.Println("Split message:", splitMessage)
 
 
 
