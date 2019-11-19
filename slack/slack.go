@@ -75,9 +75,15 @@ func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
 	println("[RECEIVED] sendResponse:", message)
 
 	splitMessage := strings.Split(message, " ")
+
 	if len(splitMessage) > 2 {
 		slackClient.SendMessage(slackClient.NewOutgoingMessage("Uh oh - too many arguments! Type in `@go-syntax-helper` for proper formating and help.", slackChannel))
 		return
+	}
+
+	if len(splitMessage) == 2 {
+		outputString := fmt.Sprintf("https://golang.org/pkg/%s/#%s", splitMessage[0], splitMessage[1])
+		slackClient.SendMessage(slackClient.NewOutgoingMessage(outputString, slackChannel))
 	}
 	fmt.Println("Split message:", splitMessage)
 
