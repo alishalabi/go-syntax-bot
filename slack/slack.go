@@ -8,11 +8,10 @@ import (
 )
 
 /*
-   TODO: Change @BOT_NAME to the same thing you entered when creating your Slack application.
    NOTE: command_arg_1 and command_arg_2 represent optional parameteras that you define
    in the Slack API UI
 */
-const helpMessage = "type in '@BOT_NAME <command_arg_1> <command_arg_2>'"
+const helpMessage = "type in '@Go-Syntax-Helper <package> <functionName>'"
 
 /*
    CreateSlackClient sets up the slack RTM (real-timemessaging) client library,
@@ -72,8 +71,17 @@ func sendHelp(slackClient *slack.RTM, message, slackChannel string) {
 // sendResponse is NOT unimplemented --- write code in the function body to complete!
 
 func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
-	command := strings.ToLower(message)
-	println("[RECEIVED] sendResponse:", command)
+	// command := strings.ToLower(message)
+	println("[RECEIVED] sendResponse:", message)
+
+	splitMessage := strings.Split(message, " ")
+	if len(splitMessage) > 2 {
+		slackClient.SendMessage(slackClient.NewOutgoingMessage("Uh oh - too many arguments! Type in `@go-syntax-helper` for proper formating and help.", slackChannel))
+		return
+	}
+	fmt.Println("Split message:", splitMessage)
+
+
 
 	// START SLACKBOT CUSTOM CODE
 	// ===============================================================
