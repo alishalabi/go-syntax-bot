@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gocolly/colly"
 	"github.com/nlopes/slack"
 )
 
@@ -52,6 +53,7 @@ func RespondToEvents(slackClient *slack.RTM) {
 			// ===============================================================
 			sendResponse(slackClient, message, ev.Channel)
 			sendHelp(slackClient, message, ev.Channel)
+			sendExample(slackClient, message, ev.Channel)
 			// ===============================================================
 			// END SLACKBOT CUSTOM CODE
 		default:
@@ -76,10 +78,10 @@ func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
 
 	splitMessage := strings.Split(message, " ")
 
-	if len(splitMessage) > 2 {
-		slackClient.SendMessage(slackClient.NewOutgoingMessage("Uh oh - too many arguments! Type in `@go-syntax-helper` for proper formating and help.", slackChannel))
-		return
-	}
+	// if len(splitMessage) > 2 {
+	// 	slackClient.SendMessage(slackClient.NewOutgoingMessage("Uh oh - too many arguments! Type in `@go-syntax-helper` for proper formating and help.", slackChannel))
+	// 	return
+	// }
 
 	if len(splitMessage) == 2 {
 		outputString := fmt.Sprintf("https://golang.org/pkg/%s/#%s", splitMessage[0], splitMessage[1])
@@ -92,7 +94,6 @@ func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
 	// fmt.Println("Split message:", splitMessage)
 
 
-
 	// START SLACKBOT CUSTOM CODE
 	// ===============================================================
 	// TODO:
@@ -101,4 +102,40 @@ func sendResponse(slackClient *slack.RTM, message, slackChannel string) {
 	//      2. STRETCH: Write a goroutine that calls an external API based on the data received in this function.
 	// ===============================================================
 	// END SLACKBOT CUSTOM CODE
+}
+
+func sendExample(slackClient *slack.RTM, message, slackChannel string) {
+	splitMessage := strings.Split(message, " ")
+
+	c := colly.NewCollector(
+			// colly.AllowedDomains("golang.org"),
+	)
+	fmt.Println("Has gotten c")
+	// fmt.Println(c)
+
+	// c.OnHTML("a[href]", func(e *colly.HTMLElement) {
+	// 	fmt.Println("In onhtml" )
+	// 	fmt.Println(e.Text)
+	// })
+
+	c.OnHTML("h2[id=ToUpper]+pre", func(e *colly.HTMLElement) {
+		// id := e.Attr("id")
+		// Print link
+		// fmt.Printf("Link found: %q -> %s\n", e.Text, id)
+		// Visit link found on page
+		// Only those links are visited which are in AllowedDomains
+		// c.Visit(e.Request.AbsoluteURL(link))
+		fmt.Println(e.Text)
+	})
+
+	// Before making a request print "Visiting ..."
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL.String())
+	})
+
+	if len(splitMessage) == 3 && splitMessage[0] == "example" {
+		// fmt.Println("Printing if statement")
+		link :=fmt.Sprintf("https://golang.org/pkg/%s/", splitMessage[1])
+		c.Visit(link)
+	}
 }
